@@ -59,6 +59,14 @@ class Themista:
         LOG.debug('Checking if {} {} is enabled and displayed'.format(element, element.tag_name))
         return element.is_enabled() and element.is_displayed()
 
+    def generate_xpath(self, tag_name, attributes):
+        xpaths_plural = "<ul>"
+        for key in attributes.keys():
+            xpaths_plural +=  "<li>.//{}[contains(@{}, '{}')]</li>".format(tag_name, key, attributes[key])
+        xpaths_plural += "</ul>"
+        return xpaths_plural
+            
+    
     def capture_element(self, element, name):
         """ capture_element 
         https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
@@ -93,9 +101,7 @@ class Themista:
                 if self.get_attributes(element) == {}:
                     continue
                 access_obj.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-                print('<tr><td>{}</td><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
-                      format(element.tag_name, self.get_attributes(element),
-                             self.is_clickable(element), '/tmp/element-{}.png'.format(uuid_value)))
+                print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,self.generate_xpath(element.tag_name, self.get_attributes(element)), '/tmp/element-{}.png'.format(uuid_value)))
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
             except Exception as f:
