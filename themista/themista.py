@@ -64,7 +64,9 @@ if __name__ == "__main__":
     for element in elements:
         print(element.tag_name, access_obj.is_clickable(element))
         try:
-            element.screenshot_as_png(f'/tmp/element-{counter}.png')
+            element.screenshot(f'/tmp/element-{counter}.png')
             counter += 1
-        except: TypeError:
+            print("Woohoo!")
+        except TypeError as e:
+            print("Woonoo...")
             pass
