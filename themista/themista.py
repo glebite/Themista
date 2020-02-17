@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from PIL import Image
 from io import BytesIO
 from selenium.webdriver.common.action_chains import ActionChains
+import uuid
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
@@ -32,6 +33,7 @@ class Themista:
 
     def goto(self, url):
         LOG.info('Navigating to {url}')
+        self.driver.maximize_window()
         self.driver.get(url)
         
     def close(self):
@@ -49,16 +51,19 @@ class Themista:
 
     def get_attributes(self, element):
         """ get_attributes """
+        LOG.debug('Retrieving attributes for {}'.format(element.tag_name))
         return access_obj.driver.execute_script('var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', element)
 
     def is_clickable(self, element):
         """ is_clickable """
+        LOG.debug('Checking if {} {} is enabled and displayed'.format(element, element.tag_name))
         return element.is_enabled() and element.is_displayed()
 
     def capture_element(self, element, name):
         """ capture_element 
         https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
         """
+        LOG.info('Performing element image capture')
         location = element.location
         size = element.size
         img = self.driver.get_screenshot_as_png()
@@ -67,26 +72,33 @@ class Themista:
         top = location['y']
         right = location['x'] + size['width']
         bottom = location['y'] + size['height']
-        img = img.crop((int(left), int(top), int(right), int(bottom)))
+        LOG.debug('Name: {} Image Range: {}'.format( name, (int(left), int(top), int(right), int(bottom))))
+        img = img.crop( (int(left), int(top), int(right), int(bottom)))
         img.save(name)
   
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
     access_obj.initialize_driver()
-    access_obj.goto('https://python.org')
+    access_obj.goto('http://the-internet.herokuapp.com/disappearing_elements')
     elements = access_obj.driver.find_elements_by_css_selector('*')
-    counter = 0
-    print(dir(elements[0]))
+    print("<html><body><table border='1'>")
     for element in elements:
-        print(element.tag_name, access_obj.is_clickable(element))
+        if element.tag_name in ['html', 'body']:
+            continue
         try:
-            builder = ActionChains(access_obj.driver)
-            builder.move_to_element(element).perform()
-            access_obj.capture_element(element, '/tmp/element-{}.png'.format(counter))
-            counter += 1
-            print("Woohoo!")
+            uuid_value = uuid.uuid1()
+            pointer = ActionChains(access_obj.driver)
+            pointer.move_to_element(element).perform()
+            if access_obj.get_attributes(element) == {}:
+                continue
+            access_obj.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
+            print('<tr><td>{}</td><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
+                  format(element.tag_name, access_obj.get_attributes(element),
+                         access_obj.is_clickable(element), '/tmp/element-{}.png'.format(uuid_value)))
         except TypeError as e:
-            print("Woonoo... {}".format(e))
+            LOG.error('Exception encountered (capturing image): {}'.format(e))
         except Exception as f:
-            print("Shazbot!")
+            LOG.error('Exception encountered (trying to actionchains): {}'.format(f))
+    print("</table></body></html>")
+    access_obj.close()
