@@ -19,3 +19,12 @@ def test_themista_repr():
 def test_themista_str():
     x = Themista()
     assert x.__str__() == ""
+
+@pytest.mark.test_id(4)
+def test_themista_driver_set():
+    x = Themista()
+    x.initialize_driver()
+    assert x.driver is not None
+    x.close()
+    
+    

@@ -22,6 +22,20 @@ class Themista:
         """ __init__ goodness - parameters, etc.. """
         LOG.info(f'Initialization of {__name__}')
 
+    def initialize_driver(self):
+        """ """
+        self.driver = webdriver.Firefox()
+        LOG.debug(f'created self.driver {self.driver}')
+
+    def goto(self, url):
+        LOG.info(f'Navigating to {url}')
+        self.driver.get(url)
+        
+    def close(self):
+        """ """
+        LOG.info(f'closing browser')
+        self.driver.close()
+
     def __repr__(self):
         """ __repr___ - method """ 
         return "<Themista>"
@@ -34,5 +48,5 @@ class Themista:
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    print(access_obj.__repr__())
-    print(access_obj.__str__())
+    access_obj.initialize_driver()
+    access_obj.goto('https://python.org')
