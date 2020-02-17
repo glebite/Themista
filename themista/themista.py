@@ -7,9 +7,9 @@ import logging
 from selenium import webdriver
 
 
-LOG = logging.getLogger('uatu')
+LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
-FH = logging.FileHandler('uatu.log')
+FH = logging.FileHandler('themista.log')
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s -%(levelname)s - %(message)s')
 FH.setFormatter(FORMATTER)
 FH.setLevel(logging.DEBUG)
