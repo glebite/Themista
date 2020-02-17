@@ -27,10 +27,12 @@ class Themista:
         return "<Themista>"
 
     def __str__(self):
-        """ __str__ - method"''
+        """ __str__ - method"""
         return ""
 
     
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
+    print(access_obj.__repr__())
+    print(access_obj.__str__())
