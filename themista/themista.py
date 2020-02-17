@@ -5,6 +5,7 @@ A test generation helping tool using selenium.
 """
 import logging
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
 
 
 LOG = logging.getLogger(__name__)
@@ -44,9 +45,26 @@ class Themista:
         """ __str__ - method"""
         return ""
 
+    def get_attributes(self, element):
+        """ get_attributes """
+        return access_obj.driver.execute_script('var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', element)
+
+    def is_clickable(self, element):
+        """ is_clickable """
+        return element.is_enabled() and element.is_displayed()
     
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
     access_obj.initialize_driver()
     access_obj.goto('https://python.org')
+    elements = access_obj.driver.find_elements_by_css_selector('*')
+    counter = 0
+    print(dir(elements[0]))
+    for element in elements:
+        print(element.tag_name, access_obj.is_clickable(element))
+        try:
+            element.screenshot_as_png(f'/tmp/element-{counter}.png')
+            counter += 1
+        except: TypeError:
+            pass
