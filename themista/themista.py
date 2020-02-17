@@ -20,7 +20,15 @@ class Themista:
     """ class definition for the tool """
     def __init__(self):
         """ __init__ goodness - parameters, etc.. """
-        pass
+        LOG.info(f'Initialization of {__name__}')
+
+    def __repr__(self):
+        """ __repr___ - method """ 
+        return "<Themista>"
+
+    def __str__(self):
+        """ __str__ - method"''
+        return ""
 
     
 """ main dunder goodness """
