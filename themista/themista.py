@@ -5,11 +5,11 @@ A test generation helping tool using selenium.
 """
 import logging
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
 from PIL import Image
 from io import BytesIO
 from selenium.webdriver.common.action_chains import ActionChains
 import uuid
+import sys
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
@@ -75,30 +75,36 @@ class Themista:
         LOG.debug('Name: {} Image Range: {}'.format( name, (int(left), int(top), int(right), int(bottom))))
         img = img.crop( (int(left), int(top), int(right), int(bottom)))
         img.save(name)
-  
+
+    def main(self, url=None):
+        if url == None:
+            raise IndexError
+        self.initialize_driver()
+        self.goto(url)
+        elements = self.driver.find_elements_by_css_selector('*')
+        print("<html><body><table border='1'>")
+        for element in elements:
+            if element.tag_name in ['html', 'body']:
+                continue
+            try:
+                uuid_value = uuid.uuid1()
+                pointer = ActionChains(self.driver)
+                pointer.move_to_element(element).perform()
+                if self.get_attributes(element) == {}:
+                    continue
+                access_obj.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
+                print('<tr><td>{}</td><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
+                      format(element.tag_name, self.get_attributes(element),
+                             self.is_clickable(element), '/tmp/element-{}.png'.format(uuid_value)))
+            except TypeError as e:
+                LOG.error('Exception encountered (capturing image): {}'.format(e))
+            except Exception as f:
+                LOG.error('Exception encountered (trying to actionchains): {}'.format(f))
+        print("</table></body></html>")
+        self.close()
+    
+        
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.initialize_driver()
-    access_obj.goto('http://the-internet.herokuapp.com/disappearing_elements')
-    elements = access_obj.driver.find_elements_by_css_selector('*')
-    print("<html><body><table border='1'>")
-    for element in elements:
-        if element.tag_name in ['html', 'body']:
-            continue
-        try:
-            uuid_value = uuid.uuid1()
-            pointer = ActionChains(access_obj.driver)
-            pointer.move_to_element(element).perform()
-            if access_obj.get_attributes(element) == {}:
-                continue
-            access_obj.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-            print('<tr><td>{}</td><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
-                  format(element.tag_name, access_obj.get_attributes(element),
-                         access_obj.is_clickable(element), '/tmp/element-{}.png'.format(uuid_value)))
-        except TypeError as e:
-            LOG.error('Exception encountered (capturing image): {}'.format(e))
-        except Exception as f:
-            LOG.error('Exception encountered (trying to actionchains): {}'.format(f))
-    print("</table></body></html>")
-    access_obj.close()
+    access_obj.main(sys.argv[1])

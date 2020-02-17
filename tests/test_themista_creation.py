@@ -26,5 +26,3 @@ def test_themista_driver_set():
     x.initialize_driver()
     assert x.driver is not None
     x.close()
-    
-    
