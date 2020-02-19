@@ -100,7 +100,7 @@ class Themista:
                 pointer.move_to_element(element).perform()
                 if self.get_attributes(element) == {}:
                     continue
-                access_obj.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
+                self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
                 print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,self.generate_xpath(element.tag_name, self.get_attributes(element)), '/tmp/element-{}.png'.format(uuid_value)))
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
