@@ -27,17 +27,18 @@ class Themista:
         LOG.info('Initialization of {__name__}')
 
     def initialize_driver(self):
-        """ """
+        """ initialize_driver """
         self.driver = webdriver.Firefox()
         LOG.debug('created self.driver {self.driver}')
 
     def goto(self, url):
+        """ goto """
         LOG.info('Navigating to {url}')
         self.driver.maximize_window()
         self.driver.get(url)
         
     def close(self):
-        """ """
+        """ close """
         LOG.info('closing browser')
         self.driver.close()
 
@@ -85,6 +86,7 @@ class Themista:
         img.save(name)
 
     def main(self, url=None):
+        """ main """
         if url == None:
             raise IndexError
         self.initialize_driver()
@@ -92,6 +94,7 @@ class Themista:
         elements = self.driver.find_elements_by_css_selector('*')
         print("<html><body><table border='1'>")
         for element in elements:
+            """ html and body are big images - no need to waste space """
             if element.tag_name in ['html', 'body']:
                 continue
             try:
