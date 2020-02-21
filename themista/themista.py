@@ -53,7 +53,8 @@ class Themista:
     def get_attributes(self, element):
         """ get_attributes """
         LOG.debug('Retrieving attributes for {}'.format(element.tag_name))
-        return access_obj.driver.execute_script('var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', element)
+        return access_obj.driver.execute_script(
+            'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', element)
 
     def is_clickable(self, element):
         """ is_clickable """
@@ -104,7 +105,11 @@ class Themista:
                 if self.get_attributes(element) == {}:
                     continue
                 self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-                print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,self.generate_xpath(element.tag_name, self.get_attributes(element)), '/tmp/element-{}.png'.format(uuid_value)))
+                print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
+                      .format(element.tag_name,
+                              self.generate_xpath(element.tag_name,
+                                                  self.get_attributes(element)),
+                              '/tmp/element-{}.png'.format(uuid_value)))
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
             except Exception as f:
