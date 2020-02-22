@@ -62,6 +62,12 @@ class Themista:
         return element.is_enabled() and element.is_displayed()
 
     def generate_xpath(self, tag_name, attributes):
+        """ generate xpaths based on a tag_name and attributes
+
+        Keyword arguments:
+        tag_name   -- the tag (such as id, div, span, ...)
+        attributes -- a list of attributes for the tag and create <ul>...</ul> string
+        """
         xpaths_plural = "<ul>"
         for key in attributes.keys():
             xpaths_plural +=  "<li>.//{}[contains(@{}, '{}')]</li>".format(tag_name, key, attributes[key])
@@ -70,8 +76,13 @@ class Themista:
             
     
     def capture_element(self, element, name):
-        """ capture_element 
+        """ capture image of the element that is pointed to.
+
         https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
+
+        Keyword arguments:
+        elemnt -- the element to retriee the image of 
+        name   -- the name of the file to write to
         """
         LOG.info('Performing element image capture')
         location = element.location
