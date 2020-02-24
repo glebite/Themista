@@ -48,13 +48,15 @@ class Themista:
 
     def __str__(self):
         """ __str__ - method"""
-        return ""
+        return "driver: {}".format(self.driver)
 
     def get_attributes(self, element):
         """ get_attributes """
         LOG.debug('Retrieving attributes for {}'.format(element.tag_name))
         return access_obj.driver.execute_script(
-            'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', element)
+            'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index)'
+            '{ items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value };'
+            'return items;', element)
 
     def is_clickable(self, element):
         """ is_clickable """
