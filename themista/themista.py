@@ -99,18 +99,7 @@ class Themista:
         img = img.crop( (int(left), int(top), int(right), int(bottom)))
         img.save(name)
 
-    def main(self, url=None):
-        """ main """
-        if url == None:
-            raise IndexError
-        self.initialize_driver()
-        self.goto(url)
-        elements = self.driver.find_elements_by_css_selector('*')
-        print("<html><body><table border='1'>")
-        for element in elements:
-            """ html and body are big images - no need to waste space """
-            if element.tag_name in ['html', 'body']:
-                continue
+    def point_retrieve_and_write(self, element):
             try:
                 uuid_value = uuid.uuid1()
                 pointer = ActionChains(self.driver)
@@ -126,7 +115,21 @@ class Themista:
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
             except Exception as f:
-                LOG.error('Exception encountered (trying to actionchains): {}'.format(f))
+                LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
+        
+    def main(self, url=None):
+        """ main """
+        if url == None:
+            raise IndexError
+        self.initialize_driver()
+        self.goto(url)
+        elements = self.driver.find_elements_by_css_selector('*')
+        print("<html><body><table border='1'>")
+        for element in elements:
+            """ html and body are big images - no need to waste space """
+            if element.tag_name in ['html', 'body']:
+                continue
+            self.point_retrieve_and_write(element)
         print("</table></body></html>")
         self.close()
     
