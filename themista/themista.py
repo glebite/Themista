@@ -53,7 +53,7 @@ class Themista:
     def get_attributes(self, element):
         """ get_attributes """
         LOG.debug('Retrieving attributes for {}'.format(element.tag_name))
-        return access_obj.driver.execute_script(
+        return self.driver.execute_script(
             'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index)'
             '{ items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value };'
             'return items;', element)
@@ -99,38 +99,54 @@ class Themista:
         img = img.crop( (int(left), int(top), int(right), int(bottom)))
         img.save(name)
 
-    def point_retrieve_and_write(self, element):
+    def point_retrieve_and_write(self, element, file_pointer):
             try:
                 uuid_value = uuid.uuid1()
                 pointer = ActionChains(self.driver)
                 pointer.move_to_element(element).perform()
                 if self.get_attributes(element) == {}:
-                    continue
+                    return
                 self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-                print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
-                      .format(element.tag_name,
-                              self.generate_xpath(element.tag_name,
-                                                  self.get_attributes(element)),
-                              '/tmp/element-{}.png'.format(uuid_value)))
+                if file_pointer:
+                    file_pointer.write('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
+                          .format(element.tag_name,
+                                  self.generate_xpath(element.tag_name,
+                                                      self.get_attributes(element)),
+                                  '/tmp/element-{}.png'.format(uuid_value)))
+                else:
+                    print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
+                          .format(element.tag_name,
+                                  self.generate_xpath(element.tag_name,
+                                                      self.get_attributes(element)),
+                                  '/tmp/element-{}.png'.format(uuid_value)))
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
             except Exception as f:
                 LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
         
-    def main(self, url=None):
+    def main(self, url=None, file_name=None):
         """ main """
+        
         if url == None:
             raise IndexError
         self.initialize_driver()
         self.goto(url)
         elements = self.driver.find_elements_by_css_selector('*')
-        print("<html><body><table border='1'>")
+        if file_name:
+            file_pointer = open(file_name, 'r')
+            file_pointer.write("<html><body><table border='1'>")
+        else:
+            print("<html><body><table border='1'>")
         for element in elements:
             """ html and body are big images - no need to waste space """
             if element.tag_name in ['html', 'body']:
                 continue
-            self.point_retrieve_and_write(element)
-        print("</table></body></html>")
+            self.point_retrieve_and_write(element, file_pointer)
+        if file_name:
+            file_pointer.write("</table></body></html>")
+            file_pointer.close()
+        else:            
+            print("</table></body></html>")
         self.close()
     
         
