@@ -107,18 +107,15 @@ class Themista:
                 if self.get_attributes(element) == {}:
                     return
                 self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
+                output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
+                          .format(element.tag_name,
+                                  self.generate_xpath(element.tag_name,
+                                                      self.get_attributes(element)),
+                                  '/tmp/element-{}.png'.format(uuid_value))
                 if file_pointer:
-                    file_pointer.write('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
-                          .format(element.tag_name,
-                                  self.generate_xpath(element.tag_name,
-                                                      self.get_attributes(element)),
-                                  '/tmp/element-{}.png'.format(uuid_value)))
+                    file_pointer.write(output_string)
                 else:
-                    print('<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
-                          .format(element.tag_name,
-                                  self.generate_xpath(element.tag_name,
-                                                      self.get_attributes(element)),
-                                  '/tmp/element-{}.png'.format(uuid_value)))
+                    print(output_string)
             except TypeError as e:
                 LOG.error('Exception encountered (capturing image): {}'.format(e))
             except Exception as f:
