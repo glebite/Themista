@@ -24,12 +24,16 @@ class Themista:
     """ class definition for the tool """
     def __init__(self):
         """ __init__ goodness - parameters, etc.. """
-        LOG.info('Initialization of {__name__}')
+        LOG.info('Initialization of {}.'.format(__name__))
 
-    def initialize_driver(self):
+    def initialize_driver(self, driver=None):
         """ initialize_driver """
-        self.driver = webdriver.Firefox()
-        LOG.debug('created self.driver {self.driver}')
+        if not driver:
+            self.driver = webdriver.Firefox()
+            LOG.debug('Created self.driver {self.driver}')
+        else:
+            self.driver = driver
+            LOG.debug("Using an already instantiated driver.")
 
     def goto(self, url):
         """ goto """
@@ -109,9 +113,9 @@ class Themista:
                 self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
                 output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
                           .format(element.tag_name,
-                                  self.generate_xpath(element.tag_name,
-                                                      self.get_attributes(element)),
-                                  '/tmp/element-{}.png'.format(uuid_value))
+                                self.generate_xpath(element.tag_name,
+                                self.get_attributes(element)),
+                                '/tmp/element-{}.png'.format(uuid_value))
                 if file_pointer:
                     file_pointer.write(output_string)
                 else:
