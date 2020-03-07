@@ -25,6 +25,7 @@ class Themista:
     def __init__(self):
         """ __init__ goodness - parameters, etc.. """
         LOG.info('Initialization of {}.'.format(__name__))
+        self.driver = None
 
     def initialize_driver(self, driver=None):
         """ initialize_driver """
@@ -111,8 +112,7 @@ class Themista:
                 if self.get_attributes(element) == {}:
                     return
                 self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-                output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'
-                          .format(element.tag_name,
+                output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,
                                 self.generate_xpath(element.tag_name,
                                 self.get_attributes(element)),
                                 '/tmp/element-{}.png'.format(uuid_value))
@@ -137,6 +137,7 @@ class Themista:
             file_pointer = open(file_name, 'r')
             file_pointer.write("<html><body><table border='1'>")
         else:
+            file_pointer = None
             print("<html><body><table border='1'>")
         for element in elements:
             """ html and body are big images - no need to waste space """

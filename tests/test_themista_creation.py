@@ -18,7 +18,7 @@ def test_themista_repr():
 @pytest.mark.test_id(3)
 def test_themista_str():
     x = Themista()
-    assert x.__str__() == ""
+    assert x.__str__() == "driver: None"
 
 @pytest.mark.test_id(4)
 def test_themista_driver_set():
