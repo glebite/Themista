@@ -115,27 +115,46 @@ class Themista:
         img.save(name)
         
     def point_retrieve_and_write(self, element, file_pointer):
-        """ point_retrieve_and_write """
-            try:
-                uuid_value = uuid.uuid1()
-                pointer = ActionChains(self.driver)
-                pointer.move_to_element(element).perform()
-                if self.get_attributes(element) == {}:
-                    return
-                self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-                output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,
-                                self.generate_xpath(element.tag_name,
-                                self.get_attributes(element)),
-                                '/tmp/element-{}.png'.format(uuid_value))
-                if file_pointer:
-                    file_pointer.write(output_string)
-                else:
-                    print(output_string)
-            except TypeError as e:
-                LOG.error('Exception encountered (capturing image): {}'.format(e))
-            except Exception as f:
-                LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
+        """ point_retrieve_and_wriee a"""
+        try:
+            uuid_value = uuid.uuid1()
+            pointer = ActionChains(self.driver)
+            pointer.move_to_element(element).perform()
+            if self.get_attributes(element) == {}:
+                return
+            self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
+            output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,
+                            self.generate_xpath(element.tag_name,
+                            self.get_attributes(element)),
+                            '/tmp/element-{}.png'.format(uuid_value))
+            if file_pointer:
+                file_pointer.write(output_string)
+            else:
+                print(output_string)
+        except TypeError as e:
+            LOG.error('Exception encountered (capturing image): {}'.format(e))
+        except Exception as f:
+            LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
+
+    def explore(self, url=None):
+        if url == None:
+            raise IndexError
+        self.initialize_driver()
+        self.goto(url)
+
+        elements = self.driver.find_elements_by_css_selector('*')
+        for element in elements:
+            if element.tag_name in ['button', 'a']:
+                if element.tag_name is 'a':
+                    href = element.get_attribute('href')
+                    if url not in href:
+                        print("Sorry - not navigating offsite: {}".format(href))
+                    else:
+                        html_data = element.text
+                        print("Navigating to: {}".format(html_data))
+        self.close()
         
+    
     def main(self, url=None, file_name=None):
         """ main """
         
@@ -167,4 +186,4 @@ class Themista:
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.main(sys.argv[1])
+    access_obj.explore(sys.argv[1])
