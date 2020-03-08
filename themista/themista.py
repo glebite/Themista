@@ -8,6 +8,10 @@ from selenium import webdriver
 from PIL import Image
 from io import BytesIO
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import uuid
 import sys
 
@@ -26,6 +30,7 @@ class Themista:
         """ __init__ goodness - parameters, etc.. """
         LOG.info('Initialization of {}.'.format(__name__))
         self.driver = None
+        self.prev_visited = dict()
 
     def initialize_driver(self, driver=None):
         """ initialize_driver """
@@ -66,7 +71,12 @@ class Themista:
     def is_clickable(self, element):
         """ is_clickable """
         LOG.debug('Checking if {} {} is enabled and displayed'.format(element, element.tag_name))
-        return element.is_enabled() and element.is_displayed()
+        # return element.is_enabled() and element.is_displayed()
+        el = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.TAG_NAME,element.tag_name)))
+        if el:
+            return True
+        else:
+            return False
 
     def generate_xpath(self, tag_name, attributes):
         """ generate xpaths based on a tag_name and attributes
@@ -103,8 +113,9 @@ class Themista:
         LOG.debug('Name: {} Image Range: {}'.format( name, (int(left), int(top), int(right), int(bottom))))
         img = img.crop( (int(left), int(top), int(right), int(bottom)))
         img.save(name)
-
+        
     def point_retrieve_and_write(self, element, file_pointer):
+        """ point_retrieve_and_write """
             try:
                 uuid_value = uuid.uuid1()
                 pointer = ActionChains(self.driver)
@@ -143,7 +154,8 @@ class Themista:
             """ html and body are big images - no need to waste space """
             if element.tag_name in ['html', 'body']:
                 continue
-            self.point_retrieve_and_write(element, file_pointer)
+            if self.is_clickable(element):
+                self.point_retrieve_and_write(element, file_pointer)
         if file_name:
             file_pointer.write("</table></body></html>")
             file_pointer.close()
