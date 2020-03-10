@@ -44,6 +44,7 @@ class Themista:
     def goto(self, url):
         """ goto """
         LOG.info('Navigating to {url}')
+        self.url = url
         self.driver.maximize_window()
         self.driver.get(url)
         
@@ -136,25 +137,49 @@ class Themista:
         except Exception as f:
             LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
 
-    def explore(self, url=None):
-        if url == None:
+    def explore(self):
+        if self.url == None:
             raise IndexError
-        self.initialize_driver()
-        self.goto(url)
 
         elements = self.driver.find_elements_by_css_selector('*')
         for element in elements:
             if element.tag_name in ['button', 'a']:
                 if element.tag_name is 'a':
                     href = element.get_attribute('href')
-                    if url not in href:
+                    if self.url not in href:
                         print("Sorry - not navigating offsite: {}".format(href))
                     else:
-                        html_data = element.text
-                        print("Navigating to: {}".format(html_data))
+                        text = element.text
+                        self.driver.refresh()
+                        print("Navigating to: {} {} {}".format(text, element.tag_name, href))
+                        element.click()
+            elif element.tag_name in ['input', 'textarea']:
+                print("-> {}".format(element.get_attribute('name')))
         self.close()
         
-    
+
+    def insertion(self, file_name = None):
+        """ insertion for live use with ipython session... """
+        elements = self.driver.find_elements_by_css_selector('*')
+        if file_name:
+            file_pointer = open(file_name, 'r')
+            file_pointer.write("<html><body><table border='1'>")
+        else:
+            file_pointer = None
+            print("<html><body><table border='1'>")
+        for element in elements:
+            """ html and body are big images - no need to waste space """
+            if element.tag_name in ['html', 'body']:
+                continue
+            if self.is_clickable(element):
+                self.point_retrieve_and_write(element, file_pointer)
+        if file_name:
+            file_pointer.write("</table></body></html>")
+            file_pointer.close()
+        else:            
+            print("</table></body></html>")
+        self.close()       
+        
     def main(self, url=None, file_name=None):
         """ main """
         
@@ -186,4 +211,7 @@ class Themista:
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.explore(sys.argv[1])
+    access_obj.initialize_driver()
+    access_obj.goto(sys.argv[1])
+    access_obj.explore()
+    
