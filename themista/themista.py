@@ -8,7 +8,7 @@ from selenium import webdriver
 from PIL import Image
 from io import BytesIO
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import WebDriverException
+# from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,7 +18,8 @@ import sys
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
 FH = logging.FileHandler('themista.log')
-FORMATTER = logging.Formatter('%(asctime)s - %(name)s -%(levelname)s - %(message)s')
+FORMATTER = logging.Formatter('%(asctime)s - %(name)s -%(levelname)s'
+                              ' - %(message)s')
 FH.setFormatter(FORMATTER)
 FH.setLevel(logging.DEBUG)
 LOG.addHandler(FH)
@@ -47,14 +48,14 @@ class Themista:
         self.url = url
         self.driver.maximize_window()
         self.driver.get(url)
-        
+
     def close(self):
         """ close """
         LOG.info('closing browser')
         self.driver.close()
 
     def __repr__(self):
-        """ __repr___ - method """ 
+        """ __repr___ - method """
         return "<Themista>"
 
     def __str__(self):
@@ -71,9 +72,10 @@ class Themista:
 
     def is_clickable(self, element):
         """ is_clickable """
-        LOG.debug('Checking if {} {} is enabled and displayed'.format(element, element.tag_name))
+        LOG.debug('Checking if {} {} is enabled and displayed'.
+                  format(element, element.tag_name))
         # return element.is_enabled() and element.is_displayed()
-        el = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.TAG_NAME,element.tag_name)))
+        el = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, element.tag_name)))
         if el:
             return True
         else:
@@ -91,15 +93,15 @@ class Themista:
             xpaths_plural +=  "<li>.//{}[contains(@{}, '{}')]</li>".format(tag_name, key, attributes[key])
         xpaths_plural += "</ul>"
         return xpaths_plural
-            
-    
+
+
     def capture_element(self, element, name):
         """ capture image of the element that is pointed to.
 
         https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
 
         Keyword arguments:
-        elemnt -- the element to retriee the image of 
+        elemnt -- the element to retriee the image of
         name   -- the name of the file to write to
         """
         LOG.info('Performing element image capture')
