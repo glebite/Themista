@@ -66,8 +66,10 @@ class Themista:
         """ get_attributes """
         LOG.debug('Retrieving attributes for {}'.format(element.tag_name))
         return self.driver.execute_script(
-            'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index)'
-            '{ items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value };'
+            'var items = {}; for (index = 0; index < arguments[0]'
+            '.attributes.length; ++index)'
+            '{ items[arguments[0].attributes[index].name]'
+            ' = arguments[0].attributes[index].value };'
             'return items;', element)
 
     def is_clickable(self, element):
@@ -75,7 +77,8 @@ class Themista:
         LOG.debug('Checking if {} {} is enabled and displayed'.
                   format(element, element.tag_name))
         # return element.is_enabled() and element.is_displayed()
-        el = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, element.tag_name)))
+        el = WebDriverWait(self.driver, 20).until(
+            EC.presence_of_element_located((By.TAG_NAME, element.tag_name)))
         if el:
             return True
         else:
@@ -86,14 +89,14 @@ class Themista:
 
         Keyword arguments:
         tag_name   -- the tag (such as id, div, span, ...)
-        attributes -- a list of attributes for the tag and create <ul>...</ul> string
+        attributes -- a list of attributes for the tag and create <ul>...</ul>
         """
         xpaths_plural = "<ul>"
         for key in attributes.keys():
-            xpaths_plural +=  "<li>.//{}[contains(@{}, '{}')]</li>".format(tag_name, key, attributes[key])
+            xpaths_plural += "<li>.//{}[contains(@{}, '{}')]</li>".format(
+                tag_name, key, attributes[key])
         xpaths_plural += "</ul>"
         return xpaths_plural
-
 
     def capture_element(self, element, name):
         """ capture image of the element that is pointed to.
@@ -113,10 +116,14 @@ class Themista:
         top = location['y']
         right = location['x'] + size['width']
         bottom = location['y'] + size['height']
-        LOG.debug('Name: {} Image Range: {}'.format( name, (int(left), int(top), int(right), int(bottom))))
-        img = img.crop( (int(left), int(top), int(right), int(bottom)))
+        LOG.debug('Name: {} Image Range: {}'.format(name,
+                                                    (int(left),
+                                                     int(top),
+                                                     int(right),
+                                                     int(bottom))))
+        img = img.crop((int(left), int(top), int(right), int(bottom)))
         img.save(name)
-        
+
     def point_retrieve_and_write(self, element, file_pointer):
         """ point_retrieve_and_wriee a"""
         try:
@@ -125,11 +132,13 @@ class Themista:
             pointer.move_to_element(element).perform()
             if self.get_attributes(element) == {}:
                 return
-            self.capture_element(element, '/tmp/element-{}.png'.format(uuid_value))
-            output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.format(element.tag_name,
-                            self.generate_xpath(element.tag_name,
-                            self.get_attributes(element)),
-                            '/tmp/element-{}.png'.format(uuid_value))
+            self.capture_element(element, '/tmp/element-{}.png'.format(
+                uuid_value))
+            output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
+            format(element.tag_name,
+                   self.generate_xpath(element.tag_name,
+                    self.get_attributes(element)),
+                    '/tmp/element-{}.png'.format(uuid_value))
             if file_pointer:
                 file_pointer.write(output_string)
             else:
@@ -137,30 +146,32 @@ class Themista:
         except TypeError as e:
             LOG.error('Exception encountered (capturing image): {}'.format(e))
         except Exception as f:
-            LOG.error('Exception encountered (trying to actionchains): {}'.format(f)) 
+            LOG.error('Exception encountered (trying to actionchains): {}'.
+                      format(f))
 
     def explore(self):
-        if self.url == None:
+        if self.url is None:
             raise IndexError
 
         elements = self.driver.find_elements_by_css_selector('*')
         for element in elements:
             if element.tag_name in ['button', 'a']:
-                if element.tag_name is 'a':
+                if element.tag_name == 'a':
                     href = element.get_attribute('href')
                     if self.url not in href:
-                        print("Sorry - not navigating offsite: {}".format(href))
+                        print("Sorry - not navigating offsite: {}".
+                              format(href))
                     else:
                         text = element.text
                         self.driver.refresh()
-                        print("Navigating to: {} {} {}".format(text, element.tag_name, href))
+                        print("Navigating to: {} {} {}".
+                              format(text, element.tag_name, href))
                         element.click()
             elif element.tag_name in ['input', 'textarea']:
                 print("-> {}".format(element.get_attribute('name')))
         self.close()
-        
 
-    def insertion(self, file_name = None):
+    def insertion(self, file_name=None):
         """ insertion for live use with ipython session... """
         elements = self.driver.find_elements_by_css_selector('*')
         if file_name:
@@ -178,14 +189,14 @@ class Themista:
         if file_name:
             file_pointer.write("</table></body></html>")
             file_pointer.close()
-        else:            
+        else:
             print("</table></body></html>")
-        self.close()       
-        
+        self.close()
+
     def main(self, url=None, file_name=None):
         """ main """
-        
-        if url == None:
+
+        if url is None:
             raise IndexError
         self.initialize_driver()
         self.goto(url)
@@ -205,15 +216,14 @@ class Themista:
         if file_name:
             file_pointer.write("</table></body></html>")
             file_pointer.close()
-        else:            
+        else:
             print("</table></body></html>")
         self.close()
-    
-        
+
+
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
     access_obj.initialize_driver()
     access_obj.goto(sys.argv[1])
     access_obj.explore()
-    
