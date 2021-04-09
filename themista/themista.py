@@ -134,11 +134,15 @@ class Themista:
                 return
             self.capture_element(element, '/tmp/element-{}.png'.format(
                 uuid_value))
-            output_string = '<tr><td>{}</td><td>{}</td><td><img src="{}" alt="screenshot"></td></tr>'.
-            format(element.tag_name,
-                   self.generate_xpath(element.tag_name,
-                    self.get_attributes(element)),
-                    '/tmp/element-{}.png'.format(uuid_value))
+            temp = '<tr><td>{}'.format(element.tag_name)
+            temp += 't</td><td>{}'.format(self.generate_xpath(element.tag_name,
+                                                              self.get_attributes(element)))
+            temp += '</td><td><img src="{}"'.format(
+            ' alt="screenshot"></td></tr>'
+            output_string = temp.format(element.tag_name,
+                                        self.generate_xpath(element.tag_name,
+                                        self.get_attributes(element)),
+                                        '/tmp/element-{}.png'.format(uuid_value))
             if file_pointer:
                 file_pointer.write(output_string)
             else:
