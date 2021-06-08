@@ -135,8 +135,9 @@ class Themista:
             self.capture_element(element, '/tmp/element-{}.png'.format(
                 uuid_value))
             temp = '<tr><td>{}'.format(element.tag_name)
-            temp += 't</td><td>{}'.format(self.generate_xpath(element.tag_name,
-                                                              self.get_attributes(element)))
+            attr = self.generate_xpath(element.tag_name,
+                                       self.get_attributes(element))
+            temp += 't</td><td>{}'.format(attr)
             temp += '</td><td><img src="{}"'.format(
             ' alt="screenshot"></td></tr>'
             output_string = temp.format(element.tag_name,
