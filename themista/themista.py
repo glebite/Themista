@@ -3,6 +3,7 @@ themista.py
 
 A test generation helping tool using selenium.
 """
+
 import logging
 from selenium import webdriver
 from PIL import Image
@@ -139,11 +140,13 @@ class Themista:
                                        self.get_attributes(element))
             temp += 't</td><td>{}'.format(attr)
             temp += '</td><td><img src="{}"'.format(
-            ' alt="screenshot"></td></tr>'
+                ' alt="screenshot"></td></tr>')
             output_string = temp.format(element.tag_name,
                                         self.generate_xpath(element.tag_name,
-                                        self.get_attributes(element)),
-                                        '/tmp/element-{}.png'.format(uuid_value))
+                                                            self.get_attributes
+                                                            (element)),
+                                        '/tmp/element-{}.png'.
+                                        format(uuid_value))
             if file_pointer:
                 file_pointer.write(output_string)
             else:
