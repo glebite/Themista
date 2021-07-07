@@ -163,20 +163,33 @@ class Themista:
 
         elements = self.driver.find_elements_by_css_selector('*')
         for element in elements:
-            if element.tag_name in ['button', 'a']:
-                if element.tag_name == 'a':
+            try:
+                check_button_link = element.tag_name in ['button', 'a']
+                check_text_link = element.tag_name in ['input', 'textarea']
+                check_a_link = (element.tag_name == 'a')
+            except Exception as e:
+                print(f"Hmmmm - caught {e}")
+            if check_button_link:
+                if check_a_link:
                     href = element.get_attribute('href')
+                    if not href:
+                        continue
                     if self.url not in href:
                         print("Sorry - not navigating offsite: {}".
                               format(href))
                     else:
                         text = element.text
                         self.driver.refresh()
-                        print("Navigating to: {} {} {}".
-                              format(text, element.tag_name, href))
-                        element.click()
-            elif element.tag_name in ['input', 'textarea']:
+                        try:
+                            print("Navigating to: {} {} {}".
+                                  format(text, element.tag_name, href))
+                            element.click()                            
+                        except Exception as e:
+                            print(f"Next situation {e}")
+
+            elif check_text_link:
                 print("-> {}".format(element.get_attribute('name')))
+
         self.close()
 
     def insertion(self, file_name=None):

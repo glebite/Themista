@@ -15,7 +15,6 @@ pathlib2==2.3.5
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==8.2.0
-pkg-resources==0.0.0
 pluggy==0.13.1
 prompt-toolkit==3.0.3
 ptyprocess==0.6.0
@@ -27,7 +26,6 @@ requests==2.22.0
 selenium==3.141.0
 six==1.14.0
 traitlets==4.3.3
-UNKNOWN==0.0.0
 urllib3==1.26.5
 wcwidth==0.1.8
 zipp==1.1.0
