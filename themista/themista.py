@@ -102,7 +102,8 @@ class Themista:
     def capture_element(self, element, name):
         """ capture image of the element that is pointed to.
 
-        https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
+        https://stackoverflow.com/questions/15018372/
+        how-to-take-partial-screenshot-with-selenium-webdriver-in-python
 
         Keyword arguments:
         elemnt -- the element to retriee the image of
@@ -183,7 +184,7 @@ class Themista:
                         try:
                             print("Navigating to: {} {} {}".
                                   format(text, element.tag_name, href))
-                            element.click()                            
+                            element.click()
                         except Exception as e:
                             print(f"Next situation {e}")
 
