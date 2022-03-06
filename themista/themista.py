@@ -13,13 +13,14 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.expected_conditions import staleness_of
 import uuid
 import sys
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
 FH = logging.FileHandler('themista.log')
-FORMATTER = logging.Formatter('%(asctime)s - %(name)s -%(levelname)s'
+FORMATTER = logging.Formatter('%(asctime)s - %(name)s -%(filename)s %(lineno)d %(levelname)s'
                               ' - %(message)s')
 FH.setFormatter(FORMATTER)
 FH.setLevel(logging.DEBUG)
@@ -45,10 +46,10 @@ class Themista:
 
     def goto(self, url):
         """ goto """
-        LOG.info('Navigating to {url}')
-        self.url = url
+        self.url = url        
+        LOG.info('Navigating to {self.url}')
         self.driver.maximize_window()
-        self.driver.get(url)
+        self.driver.get(self.url)
 
     def close(self):
         """ close """
@@ -109,7 +110,7 @@ class Themista:
         elemnt -- the element to retriee the image of
         name   -- the name of the file to write to
         """
-        LOG.info('Performing element image capture')
+        LOG.info(f'Performing element image capture {element}')
         location = element.location
         size = element.size
         img = self.driver.get_screenshot_as_png()
@@ -127,11 +128,13 @@ class Themista:
         img.save(name)
 
     def point_retrieve_and_write(self, element, file_pointer):
-        """ point_retrieve_and_wriee a"""
+        """ point_retrieve_and_write a"""
+        print(element.tag_name, type(element))
+
+        uuid_value = uuid.uuid1()
+        pointer = ActionChains(self.driver)
+        pointer.move_to_element(element).perform()
         try:
-            uuid_value = uuid.uuid1()
-            pointer = ActionChains(self.driver)
-            pointer.move_to_element(element).perform()
             if self.get_attributes(element) == {}:
                 return
             self.capture_element(element, '/tmp/element-{}.png'.format(
@@ -140,14 +143,14 @@ class Themista:
             attr = self.generate_xpath(element.tag_name,
                                        self.get_attributes(element))
             temp += 't</td><td>{}'.format(attr)
+            LOG.info(f'Type of element: {type(element)} value: {element}')
             temp += '</td><td><img src="{}"'.format(
                 ' alt="screenshot"></td></tr>')
             output_string = temp.format(element.tag_name,
                                         self.generate_xpath(element.tag_name,
                                                             self.get_attributes
-                                                            (element)),
-                                        '/tmp/element-{}.png'.
-                                        format(uuid_value))
+                                                            ('element-{}.png'.format(uuid_value))))
+                                                        
             if file_pointer:
                 file_pointer.write(output_string)
             else:
@@ -168,6 +171,8 @@ class Themista:
                 check_button_link = element.tag_name in ['button', 'a']
                 check_text_link = element.tag_name in ['input', 'textarea']
                 check_a_link = (element.tag_name == 'a')
+                LOG.debug(f'{element} -> {check_button_link}'
+                          f' {check_text_link} {check_a_link}')
             except Exception as e:
                 print(f"Hmmmm - caught {e}")
             if check_button_link:
@@ -176,20 +181,18 @@ class Themista:
                     if not href:
                         continue
                     if self.url not in href:
-                        print("Sorry - not navigating offsite: {}".
-                              format(href))
+                        LOG.debug("Sorry - not navigating offsite: {href}")
                     else:
                         text = element.text
                         self.driver.refresh()
                         try:
-                            print("Navigating to: {} {} {}".
-                                  format(text, element.tag_name, href))
+                            LOG.debug(f"Navigating to: {text} {element.tag_name} {href}")
                             element.click()
                         except Exception as e:
-                            print(f"Next situation {e}")
+                            LOG.debug(f"Next situation {e}")
 
             elif check_text_link:
-                print("-> {}".format(element.get_attribute('name')))
+                LOG.debug("-> {}".format(element.get_attribute('name')))
 
         self.close()
 
@@ -201,7 +204,7 @@ class Themista:
             file_pointer.write("<html><body><table border='1'>")
         else:
             file_pointer = None
-            print("<html><body><table border='1'>")
+            LOG.debug("<html><body><table border='1'>")
         for element in elements:
             """ html and body are big images - no need to waste space """
             if element.tag_name in ['html', 'body']:
@@ -212,7 +215,7 @@ class Themista:
             file_pointer.write("</table></body></html>")
             file_pointer.close()
         else:
-            print("</table></body></html>")
+            LOG.debug("</table></body></html>")
         self.close()
 
     def main(self, url=None, file_name=None):
@@ -224,11 +227,11 @@ class Themista:
         self.goto(url)
         elements = self.driver.find_elements_by_css_selector('*')
         if file_name:
-            file_pointer = open(file_name, 'r')
+            file_pointer = open(file_name, 'w')
             file_pointer.write("<html><body><table border='1'>")
         else:
             file_pointer = None
-            print("<html><body><table border='1'>")
+            LOG.debug("<html><body><table border='1'>")
         for element in elements:
             """ html and body are big images - no need to waste space """
             if element.tag_name in ['html', 'body']:
@@ -239,13 +242,11 @@ class Themista:
             file_pointer.write("</table></body></html>")
             file_pointer.close()
         else:
-            print("</table></body></html>")
+            LOG.debug("</table></body></html>")
         self.close()
 
 
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.initialize_driver()
-    access_obj.goto(sys.argv[1])
-    access_obj.explore()
+    access_obj.main(sys.argv[1], 'output.html')
