@@ -29,6 +29,7 @@ LOG.addHandler(FH)
 
 class Themista:
     """ class definition for the tool """
+
     def __init__(self):
         """ __init__ goodness - parameters, etc.. """
         LOG.info('Initialization of {}.'.format(__name__))
@@ -46,7 +47,7 @@ class Themista:
 
     def goto(self, url):
         """ goto """
-        self.url = url        
+        self.url = url
         LOG.info('Navigating to {self.url}')
         self.driver.maximize_window()
         self.driver.get(self.url)
@@ -150,7 +151,7 @@ class Themista:
                                         self.generate_xpath(element.tag_name,
                                                             self.get_attributes
                                                             ('element-{}.png'.format(uuid_value))))
-                                                        
+
             if file_pointer:
                 file_pointer.write(output_string)
             else:
@@ -186,7 +187,8 @@ class Themista:
                         text = element.text
                         self.driver.refresh()
                         try:
-                            LOG.debug(f"Navigating to: {text} {element.tag_name} {href}")
+                            LOG.debug(
+                                f"Navigating to: {text} {element.tag_name} {href}")
                             element.click()
                         except Exception as e:
                             LOG.debug(f"Next situation {e}")
@@ -234,7 +236,7 @@ class Themista:
             LOG.debug("<html><body><table border='1'>")
         for element in elements:
             """ html and body are big images - no need to waste space """
-            if element.tag_name in ['html', 'body']:
+            if element.tag_name in ['html', 'body', 'head', 'title', 'p', 'style']:
                 continue
             if self.is_clickable(element):
                 self.point_retrieve_and_write(element, file_pointer)
