@@ -127,6 +127,7 @@ class Themista:
                                                      int(bottom))))
         img = img.crop((int(left), int(top), int(right), int(bottom)))
         img.save(name)
+        return name
 
     def point_retrieve_and_write(self, element, file_pointer):
         """ point_retrieve_and_write a"""
@@ -138,12 +139,11 @@ class Themista:
         try:
             if self.get_attributes(element) == {}:
                 return
-            self.capture_element(element, '/tmp/element-{}.png'.format(
-                uuid_value))
+            self.capture_element(element, f'/tmp/element-{uuid_value}.png')
             temp = '<tr><td>{}'.format(element.tag_name)
             attr = self.generate_xpath(element.tag_name,
                                        self.get_attributes(element))
-            temp += 't</td><td>{}'.format(attr)
+            temp += f'</td><td>{attr}'
             LOG.info(f'Type of element: {type(element)} value: {element}')
             temp += '</td><td><img src="{}"'.format(
                 ' alt="screenshot"></td></tr>')
@@ -151,7 +151,7 @@ class Themista:
                                         self.generate_xpath(element.tag_name,
                                                             self.get_attributes
                                                             ('element-{}.png'.format(uuid_value))))
-
+            LOG.debug(output_string)
             if file_pointer:
                 file_pointer.write(output_string)
             else:
@@ -251,4 +251,4 @@ class Themista:
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.main(sys.argv[1], 'output.html')
+    access_obj.main(sys.argv[1], None)
