@@ -136,21 +136,19 @@ class Themista:
         uuid_value = uuid.uuid1()
         pointer = ActionChains(self.driver)
         pointer.move_to_element(element).perform()
+
+        if self.get_attributes(element) == {}:
+            return
+        self.capture_element(element, f'/tmp/element-{uuid_value}.png')
+        temp = '<tr><td>{}'.format(element.tag_name)
+        attr = self.generate_xpath(element.tag_name,
+                                   self.get_attributes(element))
+        temp += f'</td><td>{attr}'
+        LOG.info(f'Type of element: {type(element)} value: {element}')
+        temp += '</td><td><img src="{}" alt="screenshot"></td></tr>'
+
         try:
-            if self.get_attributes(element) == {}:
-                return
-            self.capture_element(element, f'/tmp/element-{uuid_value}.png')
-            temp = '<tr><td>{}'.format(element.tag_name)
-            attr = self.generate_xpath(element.tag_name,
-                                       self.get_attributes(element))
-            temp += f'</td><td>{attr}'
-            LOG.info(f'Type of element: {type(element)} value: {element}')
-            temp += '</td><td><img src="{}"'.format(
-                ' alt="screenshot"></td></tr>')
-            output_string = temp.format(element.tag_name,
-                                        self.generate_xpath(element.tag_name,
-                                                            self.get_attributes
-                                                            ('element-{}.png'.format(uuid_value))))
+            print(output_string)
             LOG.debug(output_string)
             if file_pointer:
                 file_pointer.write(output_string)
@@ -251,4 +249,4 @@ class Themista:
 """ main dunder goodness """
 if __name__ == "__main__":
     access_obj = Themista()
-    access_obj.main(sys.argv[1], None)
+    access_obj.main(sys.argv[1], 'output.html')
