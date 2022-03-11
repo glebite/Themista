@@ -126,13 +126,19 @@ class Themista:
                                                      int(right),
                                                      int(bottom))))
         img = img.crop((int(left), int(top), int(right), int(bottom)))
-        img.save(name)
+        try:
+            img.save(name)
+        except SystemError as e:
+            LOG.error(e)
         return name
 
     def point_retrieve_and_write(self, element, file_pointer):
         """ point_retrieve_and_write a"""
         print(element.tag_name, type(element))
 
+        if element.tag_name in ['script', 'meta', 'link']:
+            return
+        
         uuid_value = uuid.uuid1()
         pointer = ActionChains(self.driver)
         pointer.move_to_element(element).perform()
