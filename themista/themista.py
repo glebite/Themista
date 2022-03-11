@@ -139,16 +139,17 @@ class Themista:
 
         if self.get_attributes(element) == {}:
             return
-        self.capture_element(element, f'/tmp/element-{uuid_value}.png')
+        file_name = f'/tmp/element-{uuid_value}.png'
+        self.capture_element(element, file_name)
         temp = '<tr><td>{}'.format(element.tag_name)
         attr = self.generate_xpath(element.tag_name,
                                    self.get_attributes(element))
         temp += f'</td><td>{attr}'
         LOG.info(f'Type of element: {type(element)} value: {element}')
-        temp += '</td><td><img src="{}" alt="screenshot"></td></tr>'
+        temp += f'</td><td><img src="{file_name}" alt="screenshot"></td></tr>'
 
+        output_string = temp
         try:
-            print(output_string)
             LOG.debug(output_string)
             if file_pointer:
                 file_pointer.write(output_string)
