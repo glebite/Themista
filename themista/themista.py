@@ -14,6 +14,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.expected_conditions import staleness_of
+
+
 import uuid
 import sys
 
@@ -141,8 +143,12 @@ class Themista:
         
         uuid_value = uuid.uuid1()
         pointer = ActionChains(self.driver)
-        pointer.move_to_element(element).perform()
-
+        try:
+            pointer.move_to_element(element).perform()
+        except Exception as e:
+            self.driver.execute_script('window.scrollTo(0, document.bodyHeight)')
+            pointer.move_to_element(element).perform()
+        
         if self.get_attributes(element) == {}:
             return
         file_name = f'/tmp/element-{uuid_value}.png'
