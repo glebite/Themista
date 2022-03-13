@@ -35,6 +35,7 @@ class Themista:
         LOG.info('Initialization of {}.'.format(__name__))
         self.driver = None
         self.prev_visited = dict()
+        self.position = 0
 
     def initialize_driver(self, driver=None):
         """ initialize_driver """
@@ -138,10 +139,15 @@ class Themista:
 
         if element.tag_name in ['script', 'meta', 'link']:
             return
-        
+
+        self.position += 10
         uuid_value = uuid.uuid1()
         pointer = ActionChains(self.driver)
-        pointer.move_to_element(element).perform()
+        try:
+            self.driver.execute_script('window.scrollBy(0, 10)')            
+            pointer.move_to_element(element).perform()
+        except Exception as e:
+            pass
 
         if self.get_attributes(element) == {}:
             return
